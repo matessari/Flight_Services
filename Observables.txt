@@ -1,0 +1,293 @@
+<div [ngClass]="{'col-md-5':true, 'col-md-offset-3':true, 'bordering-side':true}">
+<div class="row">     
+    <button class="col-md-5 col-md-offset-3 btn btn-success" (click)="modifyVariablesOnClick()">Modify and Update Details</button>
+</div>
+<div class="col-md-5 bordering-side text-justify" *ngIf="chosenBoat!=undefined && display && !updateCheck">
+<h3>The details of Boat: {{chosenBoat.boatId}}</h3>
+<table [ngClass]="{'table':true,'table-responsive':true}">
+    <tr>
+        <th>Boat Type:</th>
+        <td>{{chosenBoat.boatType| uppercase}}</td>
+    </tr>
+    <tr>
+        <th>Location:</th>
+        <td>{{chosenBoat.location}}</td>
+    </tr>
+    <tr>
+        <th>Description:</th>
+        <td>{{chosenBoat.description}}</td>
+    </tr>
+    <tr>
+        <th>Base Price:</th>
+        <td>{{chosenBoat.basePrice}}</td>
+    </tr>
+    <tr>
+        <th>Discount:</th>
+        <td>{{chosenBoat.discount | percent}}</td>
+    </tr>
+    <tr>
+        <th>Booking starts from:</th>
+        <td>{{chosenBoat.bookingStart |date}}</td>
+    </tr>
+    <tr>
+        <th>Allowed days:</th>
+        <td>{{chosenBoat.allowedDays| days |uppercase}}</td>
+    </tr>
+</table>
+</div>
+<div class="col-md-5 bordering-side text-justify" *ngIf="updateCheck">
+    <update-boat [receivedBoat]="chosenBoat"></update-boat>
+</div>
+</div>
+
+import { Component, OnInit, Input } from '@angular/core';
+import { Boat } from '../boat';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import 'rxjs/add/operator/switchMap';
+import { BoatService } from '../boat.service';
+
+@Component({
+  selector: 'boat-details',
+  templateUrl: './boat-details.component.html',
+  styleUrls: ['./boat-details.component.css']
+})
+export class BoatDetailsComponent implements OnInit {
+  @Input()
+  chosenBoat:Boat;
+display:boolean=true;  
+updateCheck:boolean=false;
+constructor(private boatService: BoatService,private router: Router,
+  private route:ActivatedRoute) {     
+}
+
+  ngOnInit():void {
+    this.chosenBoat = new Boat();
+    this.route.paramMap
+              .switchMap( (params: ParamMap) => this.boatService.getBoatDetails(params.get('boatId') ) )
+              .subscribe(boat => {this.chosenBoat = boat; });             
+}
+
+  modifyVariablesOnClick(){
+    this.display=false;
+    this.updateCheck=true;
+    }
+
+}
+import { NgModule }             from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+import { BoatsComponent } from './boats.component';
+import { BoatDetailsComponent } from './boat-details/boat-details.component';
+import { BoatAddComponent } from './boat-add/boat-add.component';
+import { AppComponent } from './app.component';
+
+const routes: Routes = [
+   
+ { path: '', redirectTo: '/', pathMatch: 'full' },
+  { path:'allBoats', component: BoatsComponent },
+  { path: 'boat/:boatId', component: BoatDetailsComponent},
+  { path: 'boatAdd', component: BoatAddComponent}
+ 
+ 
+];
+
+@NgModule({
+  imports: [ RouterModule.forRoot(routes) ],
+  exports: [ RouterModule ]
+})
+export class AppRoutingModule {
+ 
+
+}
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+     
+      <a class="navbar-brand" routerLink="/" routerLinkActive="active">{{title}}</a>
+    </div>
+   
+      <ul class="nav navbar-nav">
+        <li>
+          <a routerLink="allBoats" routerLinkActive="active">View all boats</a>
+        </li>
+        <li>
+          <a routerLink="boatAdd" routerLinkActive="active">Add Boat</a>
+        </li>
+       
+
+      </ul>
+   
+  </div>
+</nav>
+
+<div style="text-align:center">
+  <h1>
+    Welcome to {{title}}
+  </h1>
+  <div class="container-fluid">
+    <div class="text-center">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+import { Injectable } from '@angular/core';
+import { Boat } from './boat';
+import { Http } from '@angular/http';
+import { Headers } from '@angular/http';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/of';
+import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
+@Injectable()
+export class BoatService {
+  boatList: Boat[];
+  private headers = new Headers({'Content-Type': 'application/json'} ); //Line 1
+ 
+  constructor(private http:Http) { 
+  }
+
+  getAllBoats(): Observable<Boat[]> {   
+    return this.http.get('http://localhost:1243/SeaQueenBoats/sqbBoats/boatsAll')                 
+              .map(response => response.json() as Boat[])   
+              .catch(this.errorHandler);   
+  }
+    getBoatDetails (boatId:string): Observable<Boat> {
+      return this.http.get('http://localhost:1243/SeaQueenBoats/sqbBoats/boatDetail/'+boatId)
+                      .map(response => (response.json() as Boat))
+                      .catch(this.errorHandler);
+    }
+    addBoat(boatToAdd:Boat): Observable<Boat>{     
+      const url='http://localhost:1243/SeaQueenBoats/sqbBoats/boatAdd';
+     
+      return this.http.post(url, JSON.stringify(boatToAdd), {headers:this.headers} )//Line 1     
+                      .map((response)=> <Boat> response.json()) //Line 3     
+                      .catch(this.errorHandler); //Line 4     
+    }
+
+    updateBoat(updatedBoat:Boat):Observable<Boat> {
+      const url = 'http://localhost:1243/SeaQueenBoats/sqbBoats/boatUpdate'; //Line 2
+      return this.http.put(url, JSON.stringify(updatedBoat), {headers: this.headers}) //Line 3
+      .map((res) => res.json() as Boat
+      ).catch(this.errorHandler);
+  }
+ 
+   
+    private errorHandler(error:any):Observable<any> {   
+    return Observable.throw(error.message || error);   
+    }
+    getLocations(): Observable<string[]> {
+      return Observable.of(['Allepey', 'Kumarkom', 'Srinagar', 'Goa', 'Kochi', 'Asan Barrage']);
+    }
+
+    getBoatTypes(): Observable<string[]> {     
+      return Observable.of(['Houseboat', 'Cruiser', 'Bass Boat', 'Speed Boat', 'Power Catamaran']);
+    }
+}
+
+
+
+
+
+// updateBoat() --> updateBoatDetails() --> BoatUpdateComponent <boat-update>
+// addBoat() --> addBoatDetails() -- BoatAddComponent <boat-add>
+<!--<h3 style="text-align: center">Showing all the operational boats across India</h3>
+
+
+<div [ngClass]="{'row':true}">
+    <div [ngClass]="{'col-md-5':true,'col-md-offset-2':true,'bordering':true}">
+    -->
+    <div *ngIf="!addBoatFlag"><!-- Line 1 -->
+        <h3>Showing all the operational boats across India</h3>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-md-offset-2 bordering" *ngIf="!addBoatFlag"><!-- Line 2 -->
+        <table [ngClass]="{'table':true,'table-striped':true,
+'table-responsive':true}">
+
+        <tr>
+            <th>
+                <label>Boat Type:</label>
+            </th>
+            <th>
+                <label>Location:</label>
+            </th>
+            <th>
+                <label>Price:</label>
+            </th>
+            <th>
+                <label>BookingStartDate:</label>
+            </th>
+            <th>MoreDetails</th>
+        </tr>
+
+
+        <tr *ngFor="let boat of boatData">
+            <td>{{boat.boatType| uppercase}}</td>
+            <td>
+                {{boat.location}}
+
+            </td>
+            <td>
+                {{boat.basePrice |currency:'USD':true}}
+            </td>
+            <td>
+                {{boat.bookingStart|date}}
+
+            </td>
+         
+            <td>
+                <a [routerLink]="['/boat', boat.boatId]"><div class="btn btn-primary">View or Update details</div></a>
+            </td>
+        </tr>
+    </table>
+</div>
+<!--
+<div *ngIf="show">
+<boat-details [chosenBoat]="displayBoat"></boat-details>
+  
+</div>
+-->
+
+</div>
+import { Component, OnInit } from "@angular/core";
+import { Boat } from "./boat";
+import { BOATS } from "./mock-boat";
+import { BoatService } from "./boat.service";
+
+@Component({
+    selector:'boats',
+   /* template:`
+    <h3 style="text-align:center">
+                    Showing all the operational boats across India
+                </h3>
+    `
+    */
+   templateUrl:'./boats.component.html',
+   styleUrls:['./boats.component.css']
+})
+export class BoatsComponent implements OnInit{
+    ngOnInit(): void {
+     this.boatService.getAllBoats().subscribe(boats=>this.boatData=boats)
+    // this.boatService.getAllBoats().then(boats=>this.boatData=boats)
+    }
+    boat: Boat;
+boatData:Boat[];
+addBoatFlag = false; //Will be used to show or hide the add boat form   
+showDetailFlag = false; //Will be used to show or hide the boat detail table
+selectedBoat:Boat;
+show: boolean = false;
+    constructor(private boatService:BoatService) {}
+    showBoat(boat:Boat) {
+        this.selectedBoat=boat;
+        this.showDetailFlag =this.showDetailFlag ? false:true;
+      //  alert("Details of " + this.boat.boatType + "\n" + this.boat.description);
+    }
+
+    // Method is used to switch the value of variable to display add boat form
+
+addBoat():void{
+    this.addBoatFlag = true;
+    this.showDetailFlag = false;
+}
+}

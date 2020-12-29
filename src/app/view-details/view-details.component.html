@@ -1,0 +1,52 @@
+<div class="row">
+  
+  <div class="col-md-5 col-md-offset-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">View the Flight</div>
+      <div class="panel-body">
+
+        <table class="table table-bordered table-responsive-md btn-table">
+          <thead class="table-success">
+            <tr class="text-left">
+              <th scope="col">Passenger Name</th>
+              <th scope="col">bookingId Id</th>
+              <th scope="col">No of Tickets</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Delete</th>
+            </tr>
+          </thead>
+        <tbody>
+            <tr *ngFor="let flights of flightDetails; let i = index">
+              <td>{{ flights.passengerName }}</td>
+              <td>{{ flights.bookingId }}</td>
+              <td>{{ flights.noOfTickets }}</td>
+              <td>{{ flights.totalAmount }}</td>
+              <td class="text-center edit-block">
+              <span class="delete" (click)="delete(flights, i)">
+                <button type="button"  [disabled]="!isValid" class="btn btn-danger btn-sm">Delete</button>
+              </span></td>
+            </tr>
+        <tbody>
+      </table>
+        </div>
+        <!-- Code the required HTML output 
+        headers[ Passenger Name , BookingId Id, No of Tickets , Amount, Delete]
+          array is intropilation as per list titles
+
+          
+          <form role="form">
+        <fieldset class="form-group">
+        <label>Select Category</label><br/><br/>
+        <select [(ngModel)]="selectedCategory" class="form-control">
+                <option disabled>--Select--</option>
+                <option *ngFor="let category of categories" [value]="category">{{category}}</option>
+         </select>
+        </fieldset>
+</form>
+categories = ['Juices', 'Chats', 'Meals'];
+selectedCategory: string;
+      -->
+        
+      </div>
+    </div>
+  </div>

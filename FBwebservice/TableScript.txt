@@ -1,0 +1,59 @@
+use WebApiAngular;
+
+db.Customer.drop();
+db.Order.drop();
+db.OrderItem.drop();
+db.Item.drop();
+
+
+
+db.createCollection('Item');
+db.Item.insert(
+[
+{itemID: 'IND-101',name:'Delta Airlines',fare:600,availableSeats:3,status:'Running'},
+{itemID: 'IND-102',name :'JetBlue',fare:745,availableSeats:20,status:'Cancelled'},
+{itemID: 'IND-103',name :'United Airlines',fare:865,availableSeats:40,status:'Cancelled'},
+{itemID: 'IND-104',name :'Virgin America',fare:580,availableSeats:10,status:'Cancelled'},
+{itemID: 'IND-105',name :'Allegiant Air',fare:650,availableSeats:47,status:'Running'},
+{itemID: 'IND-106',name :'Hawaiian Airlines',fare:800,availableSeats:4,status:'Running'}]
+);
+
+
+db.createCollection('Customer');
+db.Customer.insert(
+[
+{customerID:2001,name:'Markel',"noOfTickets":10,"totalAmount":6000,"flightId":'IND-101'},
+{customerID:2002,name:'Louis',"noOfTickets":20,"totalAmount":7000,"flightId":'IND-101'},
+{customerID:2003,name:'Rita',"noOfTickets":4,"totalAmount":2320,"flightId":'IND-104'},
+{customerID:2004,name:'Lizzy',"noOfTickets":2,"totalAmount":1300,"flightId":'IND-105'}
+]
+);
+
+
+db.createCollection('Order');
+db.Order.insert(
+[
+{orderID: 'IND-101',AircraftName:'Delta Airlines',fare:600,availableSeats:3,status:'Running'},
+{orderID: 'IND-102',AircraftName :'JetBlue',fare:745,availableSeats:20,status:'Cancelled'},
+{orderID: 'IND-103',AircraftName :'United Airlines',fare:865,availableSeats:40,status:'Cancelled'},
+{orderID: 'IND-104',AircraftName :'Virgin America',fare:580,availableSeats:10,status:'Cancelled'},
+{orderID: 'IND-105',AircraftName :'Allegiant Air',fare:650,availableSeats:47,status:'Running'},
+{orderID: 'IND-106',AircraftName :'Hawaiian Airlines',fare:800,availableSeats:4,status:'Running'}]
+);
+
+db.createCollection('OrderItem');
+db.OrderItem.insert(
+[
+{orderItemID: 'IND-101',AircraftName:'Delta Airlines',fare:600,availableSeats:3,status:'Running'},
+{orderItemID: 'IND-102',AircraftName :'JetBlue',fare:745,availableSeats:20,status:'Cancelled'},
+{orderItemID: 'IND-103',AircraftName :'United Airlines',fare:865,availableSeats:40,status:'Cancelled'},
+{orderItemID: 'IND-104',AircraftName :'Virgin America',fare:580,availableSeats:10,status:'Cancelled'},
+{orderItemID: 'IND-105',AircraftName :'Allegiant Air',fare:650,availableSeats:47,status:'Running'},
+{orderItemID: 'IND-106',AircraftName :'Hawaiian Airlines',fare:800,availableSeats:4,status:'Running'}]
+);
+
+
+db.Order.find().pretty();
+db.OrderItem.find().pretty();
+db.Customer.find().pretty();
+db.Item.find().pretty();

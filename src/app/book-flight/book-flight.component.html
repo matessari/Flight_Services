@@ -1,0 +1,49 @@
+<div class="row">
+  <div class="col-md-5 col-md-offset-4">
+    <div class="panel panel-primary">
+      <div class="panel-heading">Book the Flight</div>
+      <div class="panel-body">
+
+        <!--span tag displaying the errorMessages should have the ID as theerror   -->
+        <form [formGroup]="bookingForm" (ngSubmit)="book()" class="form">
+          <div class="form-group">
+            <label for="passengerName">Passenger Name</label>
+            <input type="text" class="form-control" formControlName="passengerName" id="passengerName">
+            <span class="error-message"
+              *ngIf="!bookingForm.controls.passengerName.valid && bookingForm.controls.passengerName.dirty"
+              style="color:red;">Field required</span>
+          </div>
+          <div [formGroup]="myGroup">
+            <label for="noOfTickets">Number of Tickets </label>
+            <input type="number" step="1" class="form-control" formControlName="noOfTickets" id="noOfTickets">
+            <span class="error-message"
+              *ngIf="!bookingForm.controls.noOfTickets.valid && bookingForm.controls.noOfTickets.dirty"
+              style="color:red;">Enter the Number of Tickets</span>
+          </div>
+          <div class="form-group">
+            <label for="flightId">Flight Id </label>
+            <select [(ngModel)]="flight" class="form-control">
+              <option [ngValue]="">Choose the Avaliable Flight ID</option>
+              <option *ngFor="let flights of flight" [value]="flights.flightId" formControlName="flightId">
+                {{ flights.flightId }}
+              </option>
+            </select>
+            <div class="error-message"
+              *ngIf="bookingForm.controls.flightId.errors?.flightError && bookingForm.controls.flightId.dirty"
+              style="color:red;">Enter valid Flight-ID</div>
+          </div>
+          <div class="form-group">
+            <button class="btn btn-primary" type="submit" [disabled]="!bookingForm.valid">Book</button>
+          </div>
+        </form>
+
+        <div *ngIf="errorMessage!=null">
+          <span class="error" style="color:red;">{{errorMessage}}</span>
+        </div>
+        <div *ngIf="successMessage!=null">
+          <span class="success" style="color:green;">{{successMessage}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
